@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>JavaScript中的事件处理程序 | 孙宇辉</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/3.0.3/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">JavaScript中的事件处理程序</h1><a id="logo" href="/.">孙宇辉</a><p class="description">喜欢纯粹，终生学习者</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">JavaScript中的事件处理程序</h1><div class="post-meta">Dec 18, 2015<script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> Hits</span></span></div><div class="post-content"><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>关于JavaScript中的事件，我们首先会想到的就是两种事件流：事件冒泡和事件捕获，事件流在前端面试中也问的比较多，但是从我工作的实际经验来看，事件冒泡和事件捕获的区分在工作中涉及的比较少。反倒是为事件指定处理程序用的非常多。今天我就把事件处理程序总结一下。</p>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p><strong>事件处理程序</strong>就是当指定的事件发生时的处理方式，比如说我们在网页上点击一个按钮，弹出了一个弹窗，这时候 <strong>点击</strong> 就是事件，而 <strong>弹出一个弹窗</strong> 就是相对应的事件处理程序。</p>
+<p>简单吧？那么我们怎么为一个事件添加事件处理程序呢？以前我并没有总结过，只知道有那么几种方式，总结了之后，才对事件以及事件处理程序有一个完整的了解。</p>
+<h3 id="事件处理程序"><a href="#事件处理程序" class="headerlink" title="事件处理程序"></a>事件处理程序</h3><p>事件处理程序按照指定方式的不同可以分为：</p>
+<ol>
+<li>HTML事件处理程序</li>
+<li>DOM0级事件处理程序</li>
+<li>DOM2级事件处理程序</li>
+</ol>
+<p>在DOM0级/DOM2级事件处理程序中，又涉及到IE/非IE事件处理程序。</p>
+<h6 id="HTML事件处理程序"><a href="#HTML事件处理程序" class="headerlink" title="HTML事件处理程序"></a>HTML事件处理程序</h6><p>HTML事件处理程序就是在HTML代码里为元素指定事件处理程序.</p>
+<pre><code>&lt;input type=&quot;button&quot; value=&quot;点击&quot; onclick=&quot;alert(&apos;test&apos;)&quot;&gt;
+&lt;input type=&quot;button&quot; value=&quot;点击2&quot; onclick=&quot;set()&quot;&gt;
+&lt;script&gt;
+  function set(){
+      //这时候this指向input这个元素，也就是事件的目标元素
+  }
+&lt;/script&gt;
+</code></pre><p>这种方式有两个很明显的缺点：</p>
+<ol>
+<li>当需要为多个同样的元素绑定相同的事件处理程序时，需要重复添加<code>onclick=&quot;alert(&#39;test&#39;)&quot;</code>这段代码，很明显这样是很麻烦的，并且也违背了将HTML与JavaScript分离的原则。</li>
+<li>如果用户在DOM内容加载之后，js文件加载之前点击了按钮，那就会报错。</li>
+</ol>
+<h6 id="DOM0级事件处理程序"><a href="#DOM0级事件处理程序" class="headerlink" title="DOM0级事件处理程序"></a>DOM0级事件处理程序</h6><p>DOM0级事件处理程序是先获取元素，然后为元素指定事件处理程序</p>
+<pre><code>&lt;input type=&quot;button&quot; value=&quot;点击&quot; id=&quot;btn&quot;&gt;
+&lt;script&gt;
+    var btn = document.getElementById(&apos;btn&apos;);
+    btn.onclick = function(){
+        alert(&apos;a&apos;);
+        // this指向btn
+    }
+    btn.onclick = function(){
+        alert(&apos;b&apos;);
+    }
+&lt;/script&gt;
+</code></pre><p>这种方式就避免了上文提到的DOM0级事件处理程序的两个问题，但是又有新的问题。当为一个元素指定了两个及多个同类型的事件处理程序后，后面的会将前面的覆盖。在上面的例子中，点击按钮，之后只会弹出<strong>b</strong>，虽然说这种情况比较少（如果有的话也可以通过把程序写在一个函数里来避免），但终究不是好的解决方法。</p>
+<p>想要删除事件处理程序的话只需要使用<code>btn.onclick = null</code>，这时候就会把为<code>btn</code>指定的所有<code>click事件</code>全部去掉,很明显，这也不是一种好的处理方式。</p>
+<h6 id="DOM2级事件处理程序"><a href="#DOM2级事件处理程序" class="headerlink" title="DOM2级事件处理程序"></a>DOM2级事件处理程序</h6><p>DOM2级事件处理程序有两个方法：<code>addEventListener()</code>和<code>removeEventListener()</code>。分别用于绑定事件和解除绑定。使用方法和DOM2级事件处理程序类似，先获取元素然后指定事件。</p>
+<pre><code>&lt;input type=&quot;button&quot; value=&quot;点击&quot; id=&quot;btn&quot;&gt;
+&lt;script&gt;
+    var btn = document.getElementById(&apos;btn&apos;);
+    btn.addEventListener(&apos;click&apos;,function(){
+        alert(&apos;test&apos;);
+        // this等于btn
+    },false);
+    btn.addEventListener(&apos;click&apos;,function(){
+        alert(&apos;test&apos;);
+    },false);// 无法解除绑定，因为处理程序是一个匿名函数
+&lt;/script&gt;
+</code></pre><p>这种方法相比DOM0级事件处理程序，好处是可以为同一个元素绑定多个相同类型的事件，不会彼此覆盖。</p>
+<pre><code>&lt;input type=&quot;button&quot; value=&quot;点击&quot; id=&quot;btn&quot;&gt;
+&lt;script&gt;
+    var btn = document.getElementById(&apos;btn&apos;);
+    function test(){
+        alert(&apos;test&apos;);
+    }
+    btn.addEventListener(&apos;click&apos;,test,false);
+    btn.removeEventListener(&apos;click&apos;,test,false); //这样才能接触绑定,因为事件处理程序是同一个函数
+&lt;/script&gt;
+</code></pre><p>这两个函数的最后一个参数都必须要有，表示调用事件处理程序的时间，为true表示在捕获阶段调用，为fasle表示在冒泡阶段调用。不过在我实际的工作中，很少需要特意区分冒泡和捕获，一般都是把最后一个参数设置为false。</p>
+<h6 id="IE事件处理程序"><a href="#IE事件处理程序" class="headerlink" title="IE事件处理程序"></a>IE事件处理程序</h6><p>IE中有两个事件处理程序：<code>attachEvent()</code>和<code>detachEvent()</code>，其使用形式和DOM2级的事件处理程序类似，值得注意的是设置事件名的时候需要在事件名前加<code>on</code>.</p>
+<pre><code>&lt;input type=&quot;button&quot; value=&quot;点击&quot; id=&quot;btn&quot;&gt;
+&lt;script&gt;
+    var btn = document.getElementById(&apos;btn&apos;);
+    btn.attachEvent(&quot;onclick&quot;,function(){
+        alert(&apos;test&apos;);
+        //this等于全局变量window
+    });
+&lt;/script&gt;
+</code></pre><p>在使用<code>detachEvent()</code>解除绑定时，用法和<code>removeEventListener()</code>一样，无法解除绑定的匿名函数处理程序，只能解除通过相同参数设置的处理程序。</p>
+<p>需要注意的是：不要因为IE自己定义了两个方法，就认为DOM2级的方法在IE中不能用，DOM2级的方法在IE9+中都是可以使用的。</p>
+<h3 id="事件在工作中的实际使用"><a href="#事件在工作中的实际使用" class="headerlink" title="事件在工作中的实际使用"></a>事件在工作中的实际使用</h3><p>在工作中一般都使用了某个JavaScript框架，框架本身提供了绑定事件的方法。这个时候的原则是：能使用 <strong>事件代理</strong> 就使用 <strong>事件代理</strong> 。事件代理的好处在我看来主要有两个：</p>
+<ol>
+<li>防止了可能因为资源加载的问题找不到元素而报错的情况。</li>
+<li>为多个同类型元素绑定同类型事件时不需要一个一个绑定。只需要绑定一次就行。</li>
+</ol>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://sunyuhui.com/2015/12/18/event-in-javascript/" data-id="cin3crmr60002wmwspj76wyhw" class="article-share-link">分享到</a><div class="tags"><a href="/tags/Front-End/">Front-End</a></div><div class="post-nav"><a href="/2016/01/17/2015-year/" class="pre">2015年终总结</a><a href="/2015/10/10/2015-10-10-variate-type/" class="next">全面理解JavaScript中数据类型</a></div></div></div></div><div class="pure-u-1-4"><div id="sidebar"><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Life/" style="font-size: 15px;">Life</a> <a href="/tags/Front-End/" style="font-size: 15px;">Front-End</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/01/17/2015-year/">2015年终总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/12/18/event-in-javascript/">JavaScript中的事件处理程序</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/10/10/2015-10-10-variate-type/">全面理解JavaScript中数据类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/03/30/fuck/">GitHub Pages被攻击导致本站点不能访问</a></li><li class="post-list-item"><a class="post-list-link" href="/2014/12/10/what's-the-fucking-life/">人生有何意义</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://blog.97md.net/" title="Flying-Pig - 赵兴" target="_blank">Flying-Pig - 赵兴</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">© <a href="/." rel="nofollow">孙宇辉.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.pack.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="/css/jquery.fancybox.css?v=0.0.0"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
